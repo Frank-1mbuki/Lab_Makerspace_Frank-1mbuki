@@ -1,6 +1,6 @@
 import sqlite3
 from database import get_connection
-from models import Member
+from models import Member, Equipment
 
 class MakerSpaceService:
 
