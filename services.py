@@ -22,3 +22,11 @@ class MakerSpaceService:
         for r in rows:
             m = Member(r["member_id"], r["name"], r["email"])
             print(m)
+
+   def add_equipment(self, name, category):
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute("INSERT INTO equipment (name, category) VALUES (?, ?)", (name, category))
+        conn.commit()
+        conn.close()
+        print("added equipment!")
