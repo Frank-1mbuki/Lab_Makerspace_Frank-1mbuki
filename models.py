@@ -13,7 +13,7 @@ class Equipment:
         self.name = name
         self.category = category
         self.is_available = is_available
-        
+
     def __str__(self):
         status = "Available" if self.is_available else "Borrowed"
-        return f"ID: {self.equipment_id} | Name: {self.name} | Category: {self.category} | Status: {status}
+        return f"ID: {self.equipment_id} | Name: {self.name} | Category: {self.category} | Status: {status}"
