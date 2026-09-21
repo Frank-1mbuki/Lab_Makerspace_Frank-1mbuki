@@ -1,4 +1,6 @@
+import sqlite3
 from database import get_connection
+from models import Member, Equipment
 
 class MakerSpaceService:
     def add_member(self, name, email):
