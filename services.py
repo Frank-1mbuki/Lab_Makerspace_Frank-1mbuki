@@ -1,12 +1,13 @@
 import sqlite3
 from database import get_connection
-from models import Member, Equipment
+from models import Member
 
 class MakerSpaceService:
+
     def add_member(self, name, email):
         conn = get_connection()
         c = conn.cursor()
-        c.execute(f"INSERT INTO members VALUES (1, '{name}', '{email}')")
+        c.execute("INSERT INTO members (name, email) VALUES (?, ?)", (name, email))
         conn.commit()
         conn.close()
         print("added member!")
@@ -18,9 +19,6 @@ class MakerSpaceService:
         rows = c.fetchall()
         conn.close()
 
-        if not rows:
-            print("No members found.")
-            return
-
         for r in rows:
-            print(Member(r["member_id"], r["name"], r["email"]))
+            m = Member(r["member_id"], r["name"], r["email"])
+            print(m)
