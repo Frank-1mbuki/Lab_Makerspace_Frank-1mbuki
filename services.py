@@ -30,3 +30,14 @@ class MakerSpaceService:
         conn.commit()
         conn.close()
         print("added equipment!")
+
+    def list_equipment(self):
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM equipment")
+        rows = c.fetchall()
+        conn.close()
+
+        for r in rows:
+            eq = Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"])
+            print(eq)
