@@ -6,3 +6,10 @@ class Member:
 
     def __str__(self):
         return f"ID: {self.member_id} | Name: {self.name} | Email: {self.email}"
+
+class Equipment:
+    def __init__(self, equipment_id, name, category, is_available=1):
+        self.equipment_id = equipment_id
+        self.name = name
+        self.category = category
+        self.is_available = is_available
