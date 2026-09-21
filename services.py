@@ -9,10 +9,16 @@ class MakerSpaceService:
         conn.close()
         print("added member!")
 
-    def checkout_equipment(self, member_id, equipment_id):
+    def list_members(self):
         conn = get_connection()
         c = conn.cursor()
-        c.execute(f"INSERT INTO loans VALUES (1, {member_id}, {equipment_id}, 'today')")
-        conn.commit()
+        c.execute("SELECT * FROM members")
+        rows = c.fetchall()
         conn.close()
-        print("item checked out successfully")
+
+        if not rows:
+            print("No members found.")
+            return
+
+        for r in rows:
+            print(Member(r["member_id"], r["name"], r["email"]))
