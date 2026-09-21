@@ -66,3 +66,6 @@ def main():
         elif choice == "0":
             print("Goodbye")
             print("Exited.")
+
+if __name__ == "__main__":
+    main()
