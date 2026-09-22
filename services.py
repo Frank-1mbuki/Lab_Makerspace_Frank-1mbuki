@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 from database import get_connection
-from models import Member, Equipment
+from models import Member, Equipment, Loan
 
 
 class MakerSpaceService:
@@ -9,10 +9,14 @@ class MakerSpaceService:
     def add_member(self, name, email):
         conn = get_connection()
         c = conn.cursor()
-        c.execute("INSERT INTO members (name, email) VALUES (?, ?)", (name, email))
-        conn.commit()
-        conn.close()
-        print("added member!")
+        try:
+            c.execute("INSERT INTO members (name, email) VALUES (?, ?)", (name, email))
+            conn.commit()
+            print("added member!")
+        except sqlite3.IntegrityError:
+            print("Error: Member with this email already exists.")
+        finally:
+            conn.close()
 
     def list_members(self):
         conn = get_connection()
@@ -21,9 +25,27 @@ class MakerSpaceService:
         rows = c.fetchall()
         conn.close()
 
+        if not rows:
+            print("No members found.")
+            return
+
         for r in rows:
             m = Member(r["member_id"], r["name"], r["email"])
             print(m)
+
+    def update_member(self, member_id, new_name, new_email):
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM members WHERE member_id = ?", (member_id,))
+        if not c.fetchone():
+            print("Error: Member not found!")
+            conn.close()
+            return
+
+        c.execute("UPDATE members SET name = ?, email = ? WHERE member_id = ?", (new_name, new_email, member_id))
+        conn.commit()
+        conn.close()
+        print("member updated successfully!")
 
     def add_equipment(self, name, category):
         conn = get_connection()
@@ -40,46 +62,48 @@ class MakerSpaceService:
         rows = c.fetchall()
         conn.close()
 
+        if not rows:
+            print("No equipment found.")
+            return
+
         for r in rows:
             eq = Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"])
             print(eq)
 
-    def report_active_loans(self):
+    def update_equipment(self, equipment_id, new_name, new_category):
         conn = get_connection()
         c = conn.cursor()
-        query = """
-            SELECT l.loan_id, m.name as member_name, e.name as equipment_name, l.checkout_date
-            FROM loans l
-            JOIN members m ON l.member_id = m.member_id
-            JOIN equipment e ON l.equipment_id = e.equipment_id
-            WHERE l.is_active = 1
-        """
-        c.execute(query)
-        rows = c.fetchall()
-        conn.close()
-
-        print("\n--- Currently Active Loans ---")
-        if not rows:
-            print("No active loans.")
+        c.execute("SELECT * FROM equipment WHERE equipment_id = ?", (equipment_id,))
+        if not c.fetchone():
+            print("Error: Equipment not found!")
+            conn.close()
             return
 
-        for r in rows:
-            print(f"Loan ID: {r['loan_id']} | Item: {r['equipment_name']} | Borrower: {r['member_name']} | Date: {r['checkout_date']}")
+        c.execute("UPDATE equipment SET name = ?, category = ? WHERE equipment_id = ?", (new_name, new_category, equipment_id))
+        conn.commit()
+        conn.close()
+        print("equipment updated successfully!")
 
     def checkout_equipment(self, member_id, equipment_id):
         conn = get_connection()
         c = conn.cursor()
 
+        c.execute("SELECT * FROM members WHERE member_id = ?", (member_id,))
+        if not c.fetchone():
+            print("Error: Member not found!")
+            conn.close()
+            return
+
         c.execute("SELECT is_available FROM equipment WHERE equipment_id = ?", (equipment_id,))
         item = c.fetchone()
 
         if not item:
-            print("Equipment not found!")
+            print("Error: Equipment not found!")
             conn.close()
             return
 
         if item["is_available"] == 0:
-            print("Equipment is already borrowed!")
+            print("Error: Equipment is already borrowed!")
             conn.close()
             return
 
@@ -94,11 +118,11 @@ class MakerSpaceService:
         conn = get_connection()
         c = conn.cursor()
 
-        c.execute("SELECT * FROM loans WHERE loan_id = ?", (loan_id,))
+        c.execute("SELECT * FROM loans WHERE loan_id = ? AND is_active = 1", (loan_id,))
         loan = c.fetchone()
 
         if not loan:
-            print("Loan not found!")
+            print("Error: Active loan not found!")
             conn.close()
             return
 
@@ -115,13 +139,21 @@ class MakerSpaceService:
 
         print("\n--- Members Found ---")
         c.execute("SELECT * FROM members WHERE name LIKE ? OR member_id = ?", (f"%{query}%", query))
-        for r in c.fetchall():
-            print(Member(r["member_id"], r["name"], r["email"]))
+        m_rows = c.fetchall()
+        if not m_rows:
+            print("No matching members found.")
+        else:
+            for r in m_rows:
+                print(Member(r["member_id"], r["name"], r["email"]))
 
         print("\n--- Equipment Found ---")
         c.execute("SELECT * FROM equipment WHERE name LIKE ? OR equipment_id = ?", (f"%{query}%", query))
-        for r in c.fetchall():
-            print(Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"]))
+        e_rows = c.fetchall()
+        if not e_rows:
+            print("No matching equipment found.")
+        else:
+            for r in e_rows:
+                print(Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"]))
 
         conn.close()
 
