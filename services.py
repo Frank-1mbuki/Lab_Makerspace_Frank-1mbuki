@@ -42,6 +42,28 @@ class MakerSpaceService:
             eq = Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"])
             print(eq)
 
+    def report_active_loans(self):
+    conn = get_connection()
+    c = conn.cursor()
+    query = """
+        SELECT l.loan_id, m.name as member_name, e.name as equipment_name, l.checkout_date
+        FROM loans l
+        JOIN members m ON l.member_id = m.member_id
+        JOIN equipment e ON l.equipment_id = e.equipment_id
+        WHERE l.is_active = 1
+    """
+    c.execute(query)
+    rows = c.fetchall()
+    conn.close()
+
+    print("\n--- Currently Active Loans ---")
+    if not rows:
+        print("No active loans.")
+        return
+
+    for r in rows:
+        print(f"Loan ID: {r['loan_id']} | Item: {r['equipment_name']} | Borrower: {r['member_name']} | Date: {r['checkout_date']}")
+
 def checkout_equipment(self, member_id, equipment_id):
         conn = get_connection()
         c = conn.cursor()
