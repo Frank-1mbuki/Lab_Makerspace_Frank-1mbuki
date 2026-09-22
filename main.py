@@ -1,12 +1,14 @@
 from database import init_db
 from services import MakerSpaceService
 
+
 def safe_int(prompt):
     while True:
         try:
             val = int(input(prompt))
         except ValueError:
             print("Invalid input! Enter a number.")
+
 
 def main():
     init_db()
@@ -61,7 +63,7 @@ def main():
             query = input("Search term or ID: ").strip()
             if query:
                 service.search(query)
-                
+
         elif choice == "8":
             service.report_active_loans()
 
@@ -72,6 +74,8 @@ def main():
         elif choice == "0":
             print("Goodbye")
             print("Exited.")
+            break
+
 
 if __name__ == "__main__":
     main()
