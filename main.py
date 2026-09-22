@@ -28,9 +28,12 @@ def main():
         choice = input("Enter choice: ")
 
         if choice == "1":
-            name = input("Name: ")
-            email = input("Email: ")
-            service.add_member(name, email)
+            name = input("Name: ").strip()
+            email = input("Email: ").strip()
+            if name and email:
+                service.add_member(name, email)
+            else:
+                print("Name and email cannot be empty.")
 
         elif choice == "2":
             service.list_members()
@@ -44,9 +47,10 @@ def main():
             service.list_equipment()
 
         elif choice == "5":
-            m_id = safe_int("Member ID: ")
-            e_id = safe_int("Equipment ID: ")
-            service.checkout_equipment(m_id, e_id)
+            m_id = input("Member ID: ").strip()
+            e_id = input("Equipment ID: ").strip()
+            if m_id and e_id:
+                service.checkout_equipment(int(m_id), int(e_id))
 
         elif choice == "6":
             loan_id = input("Loan ID to return: ")

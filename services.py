@@ -41,3 +41,27 @@ class MakerSpaceService:
         for r in rows:
             eq = Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"])
             print(eq)
+
+def checkout_equipment(self, member_id, equipment_id):
+        conn = get_connection()
+        c = conn.cursor()
+
+        c.execute("SELECT is_available FROM equipment WHERE equipment_id = ?", (equipment_id,))
+        item = c.fetchone()
+
+        if not item:
+            print("Equipment not found!")
+            conn.close()
+            return
+
+        if item["is_available"] == 0:
+            print("Equipment is already borrowed!")
+            conn.close()
+            return
+
+        date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        c.execute("INSERT INTO loans (member_id, equipment_id, checkout_date) VALUES (?, ?, ?)", (member_id, equipment_id, date_now))
+        c.execute("UPDATE equipment SET is_available = 0 WHERE equipment_id = ?", (equipment_id,))
+        conn.commit()
+        conn.close()
+        print("item checked out successfully!")

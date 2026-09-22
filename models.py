@@ -17,3 +17,13 @@ class Equipment:
     def __str__(self):
         status = "Available" if self.is_available else "Borrowed"
         return f"ID: {self.equipment_id} | Name: {self.name} | Category: {self.category} | Status: {status}"
+
+class Loan:
+    def __init__(self, loan_id, member_id, equipment_id, checkout_date):
+        self.loan_id = loan_id
+        self.member_id = member_id
+        self.equipment_id = equipment_id
+        self.checkout_date = checkout_date
+
+    def __str__(self):
+        return f"Loan ID: {self.loan_id} | Member ID: {self.member_id} | Item ID: {self.equipment_id} | Date: {self.checkout_date}"
