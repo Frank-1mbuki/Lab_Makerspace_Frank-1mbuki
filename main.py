@@ -58,9 +58,10 @@ def main():
                 service.return_equipment(int(l_id))
 
         elif choice == "7":
-            query = input("Search: ")
-            service.search(query)
-
+            query = input("Search term or ID: ").strip()
+            if query:
+                service.search(query)
+                
         elif choice == "8":
             service.report_active_loans()
 

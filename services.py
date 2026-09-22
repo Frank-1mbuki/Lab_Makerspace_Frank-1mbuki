@@ -84,3 +84,19 @@ def return_equipment(self, loan_id):
         conn.commit()
         conn.close()
         print("item returned successfully!")
+
+def search(self, query):
+        conn = get_connection()
+        c = conn.cursor()
+
+        print("\n--- Members Found ---")
+        c.execute("SELECT * FROM members WHERE name LIKE ? OR member_id = ?", (f"%{query}%", query))
+        for r in c.fetchall():
+            print(Member(r["member_id"], r["name"], r["email"]))
+
+        print("\n--- Equipment Found ---")
+        c.execute("SELECT * FROM equipment WHERE name LIKE ? OR equipment_id = ?", (f"%{query}%", query))
+        for r in c.fetchall():
+            print(Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"]))
+
+        conn.close()
