@@ -53,8 +53,9 @@ def main():
                 service.checkout_equipment(int(m_id), int(e_id))
 
         elif choice == "6":
-            loan_id = input("Loan ID to return: ")
-            service.return_equipment(loan_id)
+            l_id = input("Loan ID: ").strip()
+            if l_id:
+                service.return_equipment(int(l_id))
 
         elif choice == "7":
             query = input("Search: ")

@@ -10,6 +10,6 @@ def init_db():
     c = conn.cursor()
     c.execute("CREATE TABLE IF NOT EXISTS members (member_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT)")
     c.execute("CREATE TABLE IF NOT EXISTS equipment (equipment_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT, is_available INTEGER DEFAULT 1)")
-    c.execute("CREATE TABLE IF NOT EXISTS loans (loan_id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INT, equipment_id INT, checkout_date TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS loans (loan_id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INT, equipment_id INT, checkout_date TEXT, return_date TEXT, is_active INTEGER DEFAULT 1)")
     conn.commit()
     conn.close()

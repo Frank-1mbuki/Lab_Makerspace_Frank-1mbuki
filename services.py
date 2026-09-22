@@ -65,3 +65,22 @@ def checkout_equipment(self, member_id, equipment_id):
         conn.commit()
         conn.close()
         print("item checked out successfully!")
+
+def return_equipment(self, loan_id):
+        conn = get_connection()
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM loans WHERE loan_id = ?", (loan_id,))
+        loan = c.fetchone()
+
+        if not loan:
+            print("Loan not found!")
+            conn.close()
+            return
+
+        date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        c.execute("UPDATE loans SET return_date = ?, is_active = 0 WHERE loan_id = ?", (date_now, loan_id))
+        c.execute("UPDATE equipment SET is_available = 1 WHERE equipment_id = ?", (loan["equipment_id"],))
+        conn.commit()
+        conn.close()
+        print("item returned successfully!")
