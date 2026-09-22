@@ -124,3 +124,47 @@ class MakerSpaceService:
             print(Equipment(r["equipment_id"], r["name"], r["category"], r["is_available"]))
 
         conn.close()
+
+    def report_active_loans(self):
+        conn = get_connection()
+        c = conn.cursor()
+        query = """
+            SELECT l.loan_id, m.name as member_name, e.name as equipment_name, l.checkout_date
+            FROM loans l
+            JOIN members m ON l.member_id = m.member_id
+            JOIN equipment e ON l.equipment_id = e.equipment_id
+            WHERE l.is_active = 1
+        """
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
+
+        print("\n--- Currently Active Loans ---")
+        if not rows:
+            print("No active loans.")
+            return
+
+        for r in rows:
+            print(f"Loan ID: {r['loan_id']} | Item: {r['equipment_name']} | Borrower: {r['member_name']} | Date: {r['checkout_date']}")
+
+    def report_member_history(self, member_id):
+        conn = get_connection()
+        c = conn.cursor()
+        query = """
+            SELECT l.loan_id, e.name as equipment_name, l.checkout_date, l.return_date, l.is_active
+            FROM loans l
+            JOIN equipment e ON l.equipment_id = e.equipment_id
+            WHERE l.member_id = ?
+        """
+        c.execute(query, (member_id,))
+        rows = c.fetchall()
+        conn.close()
+
+        print(f"\n--- Loan History for Member #{member_id} ---")
+        if not rows:
+            print("No loans found for this member.")
+            return
+
+        for r in rows:
+            status = "Active" if r["is_active"] else f"Returned on {r['return_date']}"
+            print(f"Loan ID: {r['loan_id']} | Item: {r['equipment_name']} | Date: {r['checkout_date']} | Status: {status}")
