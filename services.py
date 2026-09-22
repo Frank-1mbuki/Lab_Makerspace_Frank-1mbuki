@@ -1,6 +1,8 @@
 import sqlite3
+from datetime import datetime
 from database import get_connection
 from models import Member, Equipment
+
 
 class MakerSpaceService:
 
@@ -43,28 +45,28 @@ class MakerSpaceService:
             print(eq)
 
     def report_active_loans(self):
-    conn = get_connection()
-    c = conn.cursor()
-    query = """
-        SELECT l.loan_id, m.name as member_name, e.name as equipment_name, l.checkout_date
-        FROM loans l
-        JOIN members m ON l.member_id = m.member_id
-        JOIN equipment e ON l.equipment_id = e.equipment_id
-        WHERE l.is_active = 1
-    """
-    c.execute(query)
-    rows = c.fetchall()
-    conn.close()
+        conn = get_connection()
+        c = conn.cursor()
+        query = """
+            SELECT l.loan_id, m.name as member_name, e.name as equipment_name, l.checkout_date
+            FROM loans l
+            JOIN members m ON l.member_id = m.member_id
+            JOIN equipment e ON l.equipment_id = e.equipment_id
+            WHERE l.is_active = 1
+        """
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
 
-    print("\n--- Currently Active Loans ---")
-    if not rows:
-        print("No active loans.")
-        return
+        print("\n--- Currently Active Loans ---")
+        if not rows:
+            print("No active loans.")
+            return
 
-    for r in rows:
-        print(f"Loan ID: {r['loan_id']} | Item: {r['equipment_name']} | Borrower: {r['member_name']} | Date: {r['checkout_date']}")
+        for r in rows:
+            print(f"Loan ID: {r['loan_id']} | Item: {r['equipment_name']} | Borrower: {r['member_name']} | Date: {r['checkout_date']}")
 
-def checkout_equipment(self, member_id, equipment_id):
+    def checkout_equipment(self, member_id, equipment_id):
         conn = get_connection()
         c = conn.cursor()
 
@@ -88,7 +90,7 @@ def checkout_equipment(self, member_id, equipment_id):
         conn.close()
         print("item checked out successfully!")
 
-def return_equipment(self, loan_id):
+    def return_equipment(self, loan_id):
         conn = get_connection()
         c = conn.cursor()
 
@@ -107,7 +109,7 @@ def return_equipment(self, loan_id):
         conn.close()
         print("item returned successfully!")
 
-def search(self, query):
+    def search(self, query):
         conn = get_connection()
         c = conn.cursor()
 
