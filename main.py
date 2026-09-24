@@ -16,18 +16,48 @@ def safe_int(prompt):
             print("Invalid input! Enter a whole number.")
 
 
-def safe_name(prompt):
-    """Read a non-empty name containing only letters and common name separators."""
+def safe_name(prompt, field_name="Name"):
+    """Read a valid person name with letters and common separators only."""
     while True:
-        name = input(prompt).strip()
-        if not name:
-            print("Name cannot be empty.")
+        value = input(prompt).strip()
+        if not value:
+            print(f"{field_name} cannot be empty.")
             continue
 
-        if all(character.isalpha() or character in " '-" for character in name):
-            return name
+        if all(character.isalpha() or character in " '-" for character in value):
+            return value
 
-        print("Invalid name! Use letters, spaces, apostrophes, or hyphens only.")
+        print(f"Invalid {field_name.lower()}! Use letters, spaces, apostrophes, or hyphens only.")
+
+
+def safe_email(prompt):
+    """Read a valid email address and keep looping until it passes basic checks."""
+    while True:
+        email = input(prompt).strip()
+        if not email:
+            print("Email cannot be empty.")
+            continue
+
+        if "@" in email and email.count("@") == 1:
+            local_part, domain = email.split("@", 1)
+            if local_part and "." in domain and domain.replace(".", "").isalpha() is False:
+                return email
+
+        print("Invalid email format. Please enter a valid email address.")
+
+
+def safe_text(prompt, field_name):
+    """General text validation for names/categories that cannot be empty."""
+    while True:
+        value = input(prompt).strip()
+        if not value:
+            print(f"{field_name} cannot be empty.")
+            continue
+
+        if all(character.isalnum() or character in " -_" for character in value):
+            return value
+
+        print(f"Invalid {field_name.lower()}! Only letters, numbers, spaces, hyphens, and underscores are allowed.")
 
 
 def main():
@@ -54,43 +84,31 @@ def main():
 
             if choice == "1":
                 name = safe_name("Name: ")
-                email = input("Email: ").strip()
-                if email:
-                    service.add_member(name, email)
-                else:
-                    print("Email cannot be empty.")
+                email = safe_email("Email: ")
+                service.add_member(name, email)
 
             elif choice == "2":
                 service.list_members()
 
             elif choice == "3":
                 m_id = safe_int("Member ID to update: ")
-                new_name = input("New Name: ").strip()
-                new_email = input("New Email: ").strip()
-                if new_name and new_email:
-                    service.update_member(m_id, new_name, new_email)
-                else:
-                    print("Name and email cannot be empty.")
+                new_name = safe_name("New Name: ")
+                new_email = safe_email("New Email: ")
+                service.update_member(m_id, new_name, new_email)
 
             elif choice == "4":
-                name = input("Equipment Name: ").strip()
-                category = input("Category: ").strip()
-                if name and category:
-                    service.add_equipment(name, category)
-                else:
-                    print("Equipment name and category cannot be empty.")
+                name = safe_text("Equipment Name: ", "Equipment name")
+                category = safe_text("Category: ", "Category")
+                service.add_equipment(name, category)
 
             elif choice == "5":
                 service.list_equipment()
 
             elif choice == "6":
                 e_id = safe_int("Equipment ID to update: ")
-                new_name = input("New Equipment Name: ").strip()
-                new_cat = input("New Category: ").strip()
-                if new_name and new_cat:
-                    service.update_equipment(e_id, new_name, new_cat)
-                else:
-                    print("Equipment name and category cannot be empty.")
+                new_name = safe_text("New Equipment Name: ", "Equipment name")
+                new_cat = safe_text("New Category: ", "Category")
+                service.update_equipment(e_id, new_name, new_cat)
 
             elif choice == "7":
                 m_id = safe_int("Member ID: ")
