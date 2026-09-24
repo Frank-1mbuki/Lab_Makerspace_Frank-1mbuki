@@ -1,3 +1,4 @@
+import re
 from database import init_db
 from services import MakerSpaceService
 
@@ -24,7 +25,7 @@ def safe_name(prompt, field_name="Name"):
             print(f"{field_name} cannot be empty.")
             continue
 
-        if all(character.isalpha() or character in " '-" for character in value):
+        if all(character.isalpha() or character in " '-'" for character in value):
             return value
 
         print(f"Invalid {field_name.lower()}! Use letters, spaces, apostrophes, or hyphens only.")
@@ -38,10 +39,8 @@ def safe_email(prompt):
             print("Email cannot be empty.")
             continue
 
-        if "@" in email and email.count("@") == 1:
-            local_part, domain = email.split("@", 1)
-            if local_part and "." in domain and domain.replace(".", "").isalpha() is False:
-                return email
+        if re.fullmatch(r"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$", email):
+            return email
 
         print("Invalid email format. Please enter a valid email address.")
 
