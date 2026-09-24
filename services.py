@@ -85,20 +85,22 @@ class MakerSpaceService:
         print("equipment updated successfully!")
 
     def checkout_equipment(self, member_id, equipment_id):
+        """Check out equipment only when both records exist and the item is available."""
         conn = get_connection()
         c = conn.cursor()
 
-        c.execute("SELECT * FROM members WHERE member_id = ?", (member_id,))
-        if not c.fetchone():
-            print("Error: Member not found!")
+        # Validate the member first so a loan can never reference a missing member.
+        c.execute("SELECT member_id FROM members WHERE member_id = ?", (member_id,))
+        if c.fetchone() is None:
+            print("Error: Member not found. Checkout cancelled.")
             conn.close()
             return
 
-        c.execute("SELECT is_available FROM equipment WHERE equipment_id = ?", (equipment_id,))
+        # Fetching the equipment row also distinguishes a missing item from a borrowed one.
+        c.execute("SELECT equipment_id, is_available FROM equipment WHERE equipment_id = ?", (equipment_id,))
         item = c.fetchone()
-
-        if not item:
-            print("Error: Equipment not found!")
+        if item is None:
+            print("Error: Equipment not found. Checkout cancelled.")
             conn.close()
             return
 
