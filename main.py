@@ -16,6 +16,20 @@ def safe_int(prompt):
             print("Invalid input! Enter a whole number.")
 
 
+def safe_name(prompt):
+    """Read a non-empty name containing only letters and common name separators."""
+    while True:
+        name = input(prompt).strip()
+        if not name:
+            print("Name cannot be empty.")
+            continue
+
+        if all(character.isalpha() or character in " '-" for character in name):
+            return name
+
+        print("Invalid name! Use letters, spaces, apostrophes, or hyphens only.")
+
+
 def main():
     init_db()
     service = MakerSpaceService()
@@ -39,12 +53,12 @@ def main():
             choice = input("Enter choice: ").strip()
 
             if choice == "1":
-                name = input("Name: ").strip()
+                name = safe_name("Name: ")
                 email = input("Email: ").strip()
-                if name and email:
+                if email:
                     service.add_member(name, email)
                 else:
-                    print("Name and email cannot be empty.")
+                    print("Email cannot be empty.")
 
             elif choice == "2":
                 service.list_members()
